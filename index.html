@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aymar Multiloja - Catálogo Exclusivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f8f8;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: #000;
+      color: #fff;
+      padding: 15px 20px;
+      z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header-content h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #ff0000;
+    }
+
+    .logo {
+      height: 50px;
+      max-width: 160px;
+      object-fit: contain;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 100px auto 20px;
+      padding: 10px;
+    }
+
+    .produto, .formulario {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      flex-wrap: nowrap;
+    }
+
+    .produto img {
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .info {
+      margin-left: 10px;
+      max-width: calc(960px - 180px);
+      flex: 1 1 auto;
+    }
+
+    .info h2 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+
+    .info p {
+      margin: 5px 0;
+    }
+
+    .info strong {
+      color: #ff0000;
+      font-size: 1.2em;
+    }
+
+    input[type=number], input[type=text], input[type=file], textarea {
+      padding: 8px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .btn {
+      background: #ff0000;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 5px;
+      font-size: 1rem;
+    }
+
+    .btn:hover {
+      background: #cc0000;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #2c2c2c;
+      color: #aaa;
+      font-size: 14px;
+    }
+
+    img.preview {
+      max-width: 200px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    #formularioCadastro {
+      display: none;
+    }
+
+    #btnCadastro {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+
+    .filtro-categorias {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .filtro-categorias button {
+      margin: 5px;
+    }
+
+    /* RESPONSIVIDADE */
+
+    @media (max-width: 700px) {
+      .container {
+        max-width: 100%;
+        margin: 90px 10px 20px;
+        padding: 5px;
+      }
+
+      .produto {
+        flex-wrap: wrap;
+      }
+
+      .produto img {
+        width: 100%;
+        height: auto;
+        max-height: 250px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+
+      .info {
+        margin-left: 0;
+        max-width: 100%;
+      }
+
+      header .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .header-content h1 {
+        font-size: 1.2rem;
+      }
+
+      #btnCadastro {
+        bottom: 15px;
+        right: 15px;
+        padding: 12px 18px;
+        font-size: 1.1rem;
+      }
+
+      .btn {
+        font-size: 1rem;
+        padding: 12px;
+        width: 100%;
+      }
+
+      input[type=number], input[type=text], input[type=file], textarea {
+        font-size: 1rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-content">
+      <h1>Aymar Multiloja - Catálogo Exclusivo</h1>
+      <img src="logo.png" alt="Logo Aymar" class="logo" />
+    </div>
+  </header>
+
+  <div class="container filtro-categorias" id="filtros"></div>
+  <div class="container" id="produtos"></div>
+
+  <div class="container">
+    <h2>Carrinho</h2>
+    <ul id="carrinho"></ul>
+    <button class="btn" onclick="finalizarPedido()">Finalizar Pedido no WhatsApp</button>
+  </div>
+
+  <div class="container formulario" id="formularioCadastro">
+    <h2 id="formTitulo">Cadastrar Produto</h2>
+    <form id="formProduto">
+      <input type="text" id="nome" placeholder="Nome do produto" required />
+      <textarea id="descricao" placeholder="Descrição do produto" required></textarea>
+      <input type="number" id="preco" placeholder="Preço (ex: 49.90)" step="0.01" required />
+      <input type="number" id="estoque" placeholder="Quantidade em estoque" required />
+      <input type="text" id="categoria" placeholder="Categoria (ex: Perfumes, Eletrônicos)" required />
+      <input type="file" id="imagem" accept="image/*" />
+      <img id="preview" class="preview" />
+      <input type="hidden" id="editIndex" value="-1" />
+      <button type="submit" class="btn">Salvar Produto</button>
+    </form>
+  </div>
+
+  <button class="btn" id="btnCadastro" onclick="mostrarCadastro()">Cadastrar Produto</button>
+
+  <footer>
+    Aymar Multiloja &copy; 2025 - Catálogo Exclusivo para Lojistas
+  </footer>
+
+  <script>
+    const carrinho = [];
+    let categoriaSelecionada = "todos";
+
+    function mostrarCadastro(index = -1) {
+      const senha = prompt("Digite a senha para cadastrar:");
+      if (senha !== "102030") return alert("Senha incorreta!");
+
+      const form = document.getElementById("formProduto");
+      document.getElementById("formularioCadastro").style.display = "block";
+
+      if (index >= 0) {
+        const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+        const p = produtos[index];
+        document.getElementById("formTitulo").textContent = "Editar Produto";
+        document.getElementById("nome").value = p.nome;
+        document.getElementById("descricao").value = p.descricao;
+        document.getElementById("preco").value = p.preco;
+        document.getElementById("estoque").value = p.estoque;
+        document.getElementById("categoria").value = p.categoria;
+        document.getElementById("preview").src = p.imagem;
+        document.getElementById("preview").style.display = "block";
+        document.getElementById("editIndex").value = index;
+      } else {
+        form.reset();
+        document.getElementById("preview").style.display = "none";
+        document.getElementById("editIndex").value = -1;
+        document.getElementById("formTitulo").textContent = "Cadastrar Produto";
+      }
+
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    document.getElementById("imagem").addEventListener("change", function () {
+      const file = this.files[0];
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("preview").src = e.target.result;
+        document.getElementById("preview").style.display = "block";
+      };
+      if (file) reader.readAsDataURL(file);
+    });
+
+    document.getElementById("formProduto").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const nome = document.getElementById("nome").value;
+      const descricao = document.getElementById("descricao").value;
+      const preco = parseFloat(document.getElementById("preco").value);
+      const estoque = parseInt(document.getElementById("estoque").value);
+      const categoria = document.getElementById("categoria").value.trim();
+      const imagem = document.getElementById("preview").src;
+      const index = parseInt(document.getElementById("editIndex").value);
+
+      const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+      const produto = { nome, descricao, preco, estoque, imagem, categoria };
+
+      if (index >= 0) {
+        produtos[index] = produto;
+      } else {
+        produtos.push(produto);
+      }
+
+      localStorage.setItem("produtos", JSON.stringify(produtos));
+      this.reset();
+      document.getElementById("formularioCadastro").style.display = "none";
+      document.getElementById("preview").style.display = "none";
+      carregarProdutos();
+    });
+
+    function carregarProdutos() {
+      const lista = document.getElementById("produtos");
+      lista.innerHTML = "";
+      const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+
+      const categorias = new Set(["todos"]);
+      produtos.forEach(p => {
+        if (p.categoria && p.categoria.trim() !== "") {
+          categorias.add(p.categoria.trim());
+        }
+      });
+      gerarFiltros(Array.from(categorias));
+
+      produtos
+        .filter(p => categoriaSelecionada === "todos" || p.categoria === categoriaSelecionada)
+        .forEach((p, i) => {
+          const div = document.createElement("div");
+          div.className = "produto";
+          div.innerHTML = `
+            <img src="${p.imagem}" alt="${p.nome}" />
+            <div class="info">
+              <h2>${p.nome}</h2>
+              <p>${p.descricao}</p>
+              <p><strong>R$ ${p.preco.toFixed(2)}</strong></p>
+              <p>Categoria: ${p.categoria}</p>
+              <p>Estoque: ${p.estoque}</p>
+              <input type="number" min="1" max="${p.estoque}" value="1" id="qtd-${i}" />
+              <button class="btn" onclick="adicionar(${i})">Adicionar</button>
+              <button class="btn" onclick="mostrarCadastro(${i})">Editar</button>
+              <button class="btn" onclick="excluirProduto(${i})">Excluir</button>
+            </div>
+          `;
+          lista.appendChild(div);
+        });
+    }
+
+    function gerarFiltros(categorias) {
+      const filtros = document.getElementById("filtros");
+      filtros.innerHTML = "<strong>Filtrar por categoria:</strong><br/>";
+      categorias
+        .filter(cat => cat && cat.trim() !== "")
+        .forEach(cat => {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.textContent = cat;
+          btn.onclick = () => {
+            categoriaSelecionada = cat;
+            carregarProdutos();
+          };
+          filtros.appendChild(btn);
+        });
+    }
+
+    function excluirProduto(index) {
+      const senha = prompt("Digite a senha para excluir:");
+      if (senha !== "102030") return alert("Senha incorreta!");
+      if (!confirm("Tem certeza que deseja excluir este produto?")) return;
+
+      const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+      produtos.splice(index, 1);
+      localStorage.setItem("produtos", JSON.stringify(produtos));
+      carregarProdutos();
+    }
+
+    function adicionar(index) {
+      const produtos = JSON.parse(localStorage.getItem("produtos") || "[]");
+      const qtd = parseInt(document.getElementById(`qtd-${index}`).value);
+      const produto = produtos[index];
+      carrinho.push({ nome: produto.nome, preco: produto.preco, qtd });
+      atualizarCarrinho();
+    }
+
+    function atualizarCarrinho() {
+      const lista = document.getElementById("carrinho");
+      lista.innerHTML = "";
+      let total = 0;
+      let totalQtd = 0;
+      carrinho.forEach((item, i) => {
+        const subtotal = item.qtd * item.preco;
+        total += subtotal;
+        totalQtd += item.qtd;
+        const li = document.createElement("li");
+        li.innerHTML = `${item.nome} - ${item.qtd} x R$ ${item.preco.toFixed(2)} = R$ ${subtotal.toFixed(2)}
+          <button onclick="removerItemCarrinho(${i})" style="margin-left:10px" class="btn">Remover</button>`;
+        lista.appendChild(li);
+      });
+      if (carrinho.length > 0) {
+        const resumo = document.createElement("li");
+        resumo.innerHTML = `<strong>Total: ${totalQtd} itens - R$ ${total.toFixed(2)}</strong>`;
+        lista.appendChild(resumo);
+      }
+    }
+
+    function removerItemCarrinho(index) {
+      carrinho.splice(index, 1);
+      atualizarCarrinho();
+    }
+
+    function finalizarPedido() {
+      if (carrinho.length === 0) return alert("Carrinho vazio!");
+      let msg = "*Pedido Grupo Aymar:*\n";
+      let total = 0;
+      carrinho.forEach(p => {
+        const sub = p.qtd * p.preco;
+        total += sub;
+        msg += `\n${p.nome} - ${p.qtd} x R$ ${p.preco.toFixed(2)} = R$ ${sub.toFixed(2)}`;
+      });
+      msg += `\n\n*Total: R$ ${total.toFixed(2)}*`;
+      const fone = "5544998405664";
+      window.open(`https://wa.me/${fone}?text=${encodeURIComponent(msg)}`, "_blank");
+    }
+
+    document.addEventListener("DOMContentLoaded", carregarProdutos);
+  </script>
+</body>
+</html>
